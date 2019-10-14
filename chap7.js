@@ -88,7 +88,7 @@ function runRobot(state, robot, memory) {
     for (let turn = 0;; turn++) {
       if (state.parcels.length == 0) {
         console.log(`Done in ${turn} turns`);
-        break;
+        return turn;
       }
       let action = robot(state, memory);
       state = state.move(action.direction);
@@ -174,19 +174,23 @@ function goalOrientedRobot({place, parcels}, route) {
 
 function compareRobots(robot1, memory1, robot2, memory2) {
     let count = 0;
-    let robot1Steps = 0;
-    let robot2Steps = 0;
+    let robot1Turns = 0;
+    let robot2Turns = 0;
     let destinations = Object.keys(roadGraph);
     for (let i = 0; i < 100; i++){
-        if (destinations.length === 0) {
-            destinations = Object.keys(roadGraph);
-        }
-
         let to = randomPick(destinations);
+        let start = randomPick(destinations);
 
-        
-
+        robot1Turns += runRobot(VillageState.random(), robot1, []);
+        robot2Turns += runRobot(VillageState.random(), robot2, []);
+        console.log(robot1Turns);
+        console.log(robot2Turns);
     }
+    console.log(robot1Turns);
+    console.log(robot2Turns);
+    return {"r1": robot1Turns/100, "r2": robot2Turns/100};
 }
 
-compareRobots(routeRobot, [], goalOrientedRobot, []);
+let {r1, r2} = compareRobots(routeRobot, [], goalOrientedRobot, []);
+
+console.log(r1, r2);
