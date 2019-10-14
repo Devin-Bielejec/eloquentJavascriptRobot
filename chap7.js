@@ -172,15 +172,30 @@ function goalOrientedRobot({place, parcels}, route) {
     return {direction: route[0], memory: route.slice(1)};
   }
 
+function goalOrientedRobotV2({place, parcels}, route) {
+    if (route.length == 0) {
+        let minRoute = Infinity;
+        let parcelsArray = parcels.map( p => {
+            console.log(p)
+            route = findRoute(roadGraph, place, p.address);
+            return {place: p.place, address: p.address, length: route.length}
+        });
+
+        let parcel = parcelsArray.sort((a,b) => a.length - b.length)[0];
+        
+        if (parcel.place != place) {
+            route = findRoute(roadGraph, place, parcel.place);
+        } else {
+            route = findRoute(roadGraph, place, parcel.address);
+        }
+    }
+    return {direction: route[0], memory: route.slice(1)};
+    }
+
 function compareRobots(robot1, memory1, robot2, memory2) {
-    let count = 0;
     let robot1Turns = 0;
     let robot2Turns = 0;
-    let destinations = Object.keys(roadGraph);
     for (let i = 0; i < 100; i++){
-        let to = randomPick(destinations);
-        let start = randomPick(destinations);
-
         robot1Turns += runRobot(VillageState.random(), robot1, []);
         robot2Turns += runRobot(VillageState.random(), robot2, []);
         console.log(robot1Turns);
@@ -191,6 +206,6 @@ function compareRobots(robot1, memory1, robot2, memory2) {
     return {"r1": robot1Turns/100, "r2": robot2Turns/100};
 }
 
-let {r1, r2} = compareRobots(routeRobot, [], goalOrientedRobot, []);
+let {r1, r2} = compareRobots(goalOrientedRobotV2, [], goalOrientedRobot, []);
 
 console.log(r1, r2);
